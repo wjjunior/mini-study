@@ -1,121 +1,37 @@
-import { useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import MiniSignalPlot from "./MiniSignalPlot";
-import { fetchStudy, fetchEvents } from "../api/mockApi";
 import {
   studyIdAtom,
-  studyMetadataAtom,
-  eventsAtom,
   createStudyId,
+  useStudyData,
+  useEventPolling,
 } from "../domains/study";
-import { signalsAtom, displaySignalsSelector } from "../domains/signal";
+import { displaySignalsSelector } from "../domains/signal";
 import {
   loadingStateAtom,
   errorStateAtom,
   chartDimensionsAtom,
-  pollMsAtom,
-  lastFetchedAtAtom,
-  timeWindowAtom,
-  visibleSignalKeysAtom,
 } from "../shared/store";
 import SignalToggles from "./SignalToggles";
 import TimelineControls from "./TimelineControls";
 import { filteredEventsSelector } from "../domains/study/store/selectors/filteredEventsSelector";
-import type { SignalKey } from "../domains/signal/model/types";
 
 const AssessmentContainer = () => {
   const [studyId, setStudyId] = useRecoilState(studyIdAtom);
-  const setMetadata = useSetRecoilState(studyMetadataAtom);
-  const setSignals = useSetRecoilState(signalsAtom);
-  const setEvents = useSetRecoilState(eventsAtom);
 
   const loading = useRecoilValue(loadingStateAtom);
   const error = useRecoilValue(errorStateAtom);
   const chartDimensions = useRecoilValue(chartDimensionsAtom);
-  const pollMs = useRecoilValue(pollMsAtom);
 
   const displaySignals = useRecoilValue(displaySignalsSelector);
   const events = useRecoilValue(filteredEventsSelector);
 
-  const setLoading = useSetRecoilState(loadingStateAtom);
-  const setError = useSetRecoilState(errorStateAtom);
-  const setLastFetchedAt = useSetRecoilState(lastFetchedAtAtom);
-  const setTimeWindow = useSetRecoilState(timeWindowAtom);
-  const setVisibleKeys = useSetRecoilState(visibleSignalKeysAtom);
-
-  // TO FIX: Race condition - if studyId changes during fetch, wrong data may be displayed
-  useEffect(() => {
-    let cancelled = false;
-    const controller = new AbortController();
-
-    setLoading(true);
-    setError(null);
-
-    fetchStudy(studyId, controller.signal)
-      .then((data) => {
-        if (cancelled) return;
-
-        setMetadata(data.metadata);
-        setSignals(data.signals);
-        setEvents(data.events);
-        setTimeWindow({
-          startSec: data.metadata.study_start,
-          endSec: data.metadata.study_end,
-        });
-
-        const availableKeys = new Set<SignalKey>(
-          Object.keys(data.signals).filter(
-            (key) => data.signals[key as keyof typeof data.signals]
-          ) as SignalKey[]
-        );
-        setVisibleKeys(availableKeys);
-
-        setLastFetchedAt(Date.now());
-        setLoading(false);
-        setError(null);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setLoading(false);
-        setError({
-          message: err?.message || "Failed to load study",
-          context: "fetchStudy",
-          timestamp: Date.now(),
-        });
-      });
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [
-    studyId,
-    setLoading,
-    setError,
-    setMetadata,
-    setSignals,
-    setEvents,
-    setTimeWindow,
-    setLastFetchedAt,
-    setVisibleKeys,
-  ]);
-
-  // TO FIX: polling events with setInterval, no cleanup, and using pollMs in deps
-  useEffect(() => {
-    const id = setInterval(() => {
-      fetchEvents(studyId).then((newEvents) => {
-        // TO FIX: should verify studyId hasn't changed before updating
-        setEvents(newEvents);
-        setLastFetchedAt(Date.now());
-      });
-    }, pollMs);
-
-    return () => clearInterval(id);
-  }, [pollMs, studyId, setEvents, setLastFetchedAt]);
+  useStudyData();
+  useEventPolling();
 
   return (
     <Box sx={{ p: 2, height: "100%", boxSizing: "border-box" }}>
