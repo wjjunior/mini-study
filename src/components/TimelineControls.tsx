@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
@@ -9,33 +10,45 @@ const TimelineControls = () => {
   const metadata = useRecoilValue(studyMetadataAtom);
   const [timeWindow, setTimeWindow] = useRecoilState(timeWindowAtom);
 
-  const applyWindow = (windowSizeSeconds: number) => {
-    const startSec = metadata?.study_start ?? 0;
-    const endSec = Math.min(
-      metadata?.study_end ?? startSec + windowSizeSeconds,
-      startSec + windowSizeSeconds
-    );
+  const applyWindow = useCallback(
+    (windowSizeSeconds: number) => {
+      const startSec = metadata?.study_start ?? 0;
+      const endSec = Math.min(
+        metadata?.study_end ?? startSec + windowSizeSeconds,
+        startSec + windowSizeSeconds
+      );
 
-    setTimeWindow({
-      startSec,
-      endSec,
-    });
-  };
+      setTimeWindow({
+        startSec,
+        endSec,
+      });
+    },
+    [metadata, setTimeWindow]
+  );
+
+  const windowSizes = useMemo(() => [30, 120, 600], []);
+
+  const formatWindowSize = useCallback((seconds: number) => {
+    if (seconds < 60) return `${seconds}s`;
+    if (seconds < 3600) return `${seconds / 60} min`;
+    return `${seconds / 3600} h`;
+  }, []);
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
       <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
         Zoom window:
       </Typography>
-      <Button size="sm" variant="outlined" onClick={() => applyWindow(30)}>
-        30s
-      </Button>
-      <Button size="sm" variant="outlined" onClick={() => applyWindow(120)}>
-        2 min
-      </Button>
-      <Button size="sm" variant="outlined" onClick={() => applyWindow(600)}>
-        10 min
-      </Button>
+      {windowSizes.map((size) => (
+        <Button
+          key={size}
+          size="sm"
+          variant="outlined"
+          onClick={() => applyWindow(size)}
+        >
+          {formatWindowSize(size)}
+        </Button>
+      ))}
       <Typography sx={{ fontSize: 12, color: "#777", ml: 1 }}>
         Current: {timeWindow.startSec}s → {timeWindow.endSec}s
       </Typography>
