@@ -12,7 +12,8 @@ import {
   lastFetchedAtAtom,
 } from "../../../../shared/store";
 import { fetchStudy } from "../../../../api/mockApi";
-import type { SignalKey } from "../../../signal/model/types";
+import { isValidSignalKey } from "../../../signal";
+import type { SignalKey } from "../../../signal";
 
 export function useStudyData() {
   const studyId = useRecoilValue(studyIdAtom);
@@ -56,8 +57,9 @@ export function useStudyData() {
 
         const availableKeys = new Set<SignalKey>(
           Object.keys(data.signals).filter(
-            (key) => data.signals[key as SignalKey]
-          ) as SignalKey[]
+            (key): key is SignalKey =>
+              isValidSignalKey(key) && !!data.signals[key]
+          )
         );
         setVisibleKeys(availableKeys);
 

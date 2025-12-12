@@ -1,6 +1,10 @@
 import { useMemo } from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+import { COLORS } from "../shared/lib/theme";
+import {
+  StyledSignalPlotBox,
+  StyledText,
+  StyledSignalTitle,
+} from "../shared/ui/styled";
 
 type MiniSignalPlotProps = {
   title: string;
@@ -15,7 +19,7 @@ const MiniSignalPlot = ({
   title,
   width,
   height,
-  color = "#1976d2",
+  color = COLORS.blue,
   values,
   timestamps,
 }: MiniSignalPlotProps) => {
@@ -67,21 +71,26 @@ const MiniSignalPlot = ({
   }, [values, timestamps, innerW, innerH]);
 
   return (
-    <Box sx={{ border: "1px solid #E0E0E0", borderRadius: 1, p: 1 }}>
-      <Typography sx={{ fontWeight: 600, mb: 0.5 }}>{title}</Typography>
-      <Typography sx={{ fontSize: 12, color: "#666", mb: 1 }}>
+    <StyledSignalPlotBox>
+      <StyledSignalTitle>{title}</StyledSignalTitle>
+      <StyledText.Stats>
         yMin: {Number.isFinite(yMin) ? yMin.toFixed(2) : "—"} | yMax:{" "}
         {Number.isFinite(yMax) ? yMax.toFixed(2) : "—"}
-      </Typography>
+      </StyledText.Stats>
       <svg width={width} height={height}>
         <g transform={`translate(${padding}, ${padding})`}>
-          <rect width={innerW} height={innerH} fill="#fafafa" stroke="#eee" />
+          <rect
+            width={innerW}
+            height={innerH}
+            fill={COLORS.offWhite}
+            stroke={COLORS.borderLightGray}
+          />
           {path && (
             <path d={path} stroke={color} fill="none" strokeWidth={1.5} />
           )}
         </g>
       </svg>
-    </Box>
+    </StyledSignalPlotBox>
   );
 };
 

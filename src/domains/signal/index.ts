@@ -1,5 +1,5 @@
-export type { SignalSeries, Signals, SignalKey } from "./model/types";
-export { isValidSignalKey } from "./model/types";
+export type { SignalSeries, Signals } from "./model/types";
+export { SignalKey, isValidSignalKey } from "./model/types";
 
 export { signalsAtom } from "./store/atoms/signalsAtom";
 

@@ -12,8 +12,15 @@ export interface Signals {
   position?: SignalSeries;
 }
 
-export type SignalKey = "hr" | "spo2" | "resp" | "position";
+export const SignalKey = {
+  hr: "hr",
+  spo2: "spo2",
+  resp: "resp",
+  position: "position",
+} as const;
+
+export type SignalKey = (typeof SignalKey)[keyof typeof SignalKey];
 
 export function isValidSignalKey(key: string): key is SignalKey {
-  return ["hr", "spo2", "resp", "position"].includes(key);
+  return (Object.values(SignalKey) as string[]).includes(key);
 }

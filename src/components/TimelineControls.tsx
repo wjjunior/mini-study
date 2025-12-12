@@ -2,9 +2,9 @@ import { useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import Stack from "@mui/joy/Stack";
 import Button from "@mui/joy/Button";
-import Typography from "@mui/material/Typography";
 import { studyMetadataAtom } from "../domains/study";
 import { timeWindowAtom } from "../shared/store";
+import { StyledText } from "../shared/ui/styled";
 
 const TimelineControls = () => {
   const metadata = useRecoilValue(studyMetadataAtom);
@@ -36,9 +36,7 @@ const TimelineControls = () => {
 
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Typography sx={{ fontSize: 14, fontWeight: 600 }}>
-        Zoom window:
-      </Typography>
+      <StyledText.Label>Zoom window:</StyledText.Label>
       {windowSizes.map((size) => (
         <Button
           key={size}
@@ -49,9 +47,9 @@ const TimelineControls = () => {
           {formatWindowSize(size)}
         </Button>
       ))}
-      <Typography sx={{ fontSize: 12, color: "#777", ml: 1 }}>
+      <StyledText.TertiaryWithMargin>
         Current: {timeWindow.startSec}s → {timeWindow.endSec}s
-      </Typography>
+      </StyledText.TertiaryWithMargin>
     </Stack>
   );
 };
