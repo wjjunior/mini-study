@@ -1,33 +1,28 @@
-import React from "react"
-import { useRecoilState, useRecoilValue } from "recoil"
-import Stack from "@mui/joy/Stack"
-import Checkbox from "@mui/material/Checkbox"
-import FormControlLabel from "@mui/material/FormControlLabel"
-import Typography from "@mui/material/Typography"
-import { assessmentGlobalState } from "../store/globalStore"
+import { useRecoilState, useRecoilValue } from "recoil";
+import Stack from "@mui/joy/Stack";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Typography from "@mui/material/Typography";
+import { signalsAtom, visibleSignalsSelector } from "../domains/signal";
+import { visibleSignalKeysAtom } from "../shared/store";
+import type { SignalKey } from "../domains/signal/model/types";
 
 const SignalToggles = () => {
-  const [state, setState] = useRecoilState(assessmentGlobalState)
-  const { signals, visibleSignals } = useRecoilValue(assessmentGlobalState)
+  const signals = useRecoilValue(signalsAtom);
+  const visibleSignals = useRecoilValue(visibleSignalsSelector);
+  const [visibleKeys, setVisibleKeys] = useRecoilState(visibleSignalKeysAtom);
 
-  const handleToggle = (key: "hr" | "spo2" | "resp" | "position") => {
-    const nextVisible = { ...visibleSignals }
+  const handleToggle = (key: SignalKey) => {
+    const newVisibleKeys = new Set(visibleKeys);
 
-    if (nextVisible[key]) {
-      // hide
-      nextVisible[key] = undefined
+    if (newVisibleKeys.has(key)) {
+      newVisibleKeys.delete(key);
     } else if (signals[key]) {
-      // TO FIX: copy entire series into visibleSignals instead of simple ID
-      nextVisible[key] = signals[key]
-        ? { ...signals[key]!, values: [...(signals[key]!.values || [])] }
-        : undefined
+      newVisibleKeys.add(key);
     }
 
-    setState((prev) => ({
-      ...prev,
-      visibleSignals: nextVisible,
-    }))
-  }
+    setVisibleKeys(newVisibleKeys);
+  };
 
   return (
     <Stack direction="row" spacing={2} alignItems="center">
@@ -71,7 +66,7 @@ const SignalToggles = () => {
         label="Position"
       />
     </Stack>
-  )
-}
+  );
+};
 
-export default SignalToggles
+export default SignalToggles;
