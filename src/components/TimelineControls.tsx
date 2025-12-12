@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import Stack from "@mui/joy/Stack";
-import Button from "@mui/joy/Button";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
 import { studyMetadataAtom } from "../domains/study";
 import { timeWindowAtom } from "../shared/store";
 import { StyledText } from "../shared/ui/styled";
@@ -40,7 +40,7 @@ const TimelineControls = () => {
       {windowSizes.map((size) => (
         <Button
           key={size}
-          size="sm"
+          size="small"
           variant="outlined"
           onClick={() => applyWindow(size)}
         >

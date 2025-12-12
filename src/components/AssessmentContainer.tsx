@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
-import Stack from "@mui/joy/Stack";
-import Button from "@mui/joy/Button";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
 import { useRecoilState, useRecoilValue } from "recoil";
 import MiniSignalPlot from "./MiniSignalPlot";
 import {
@@ -91,7 +91,7 @@ const AssessmentContainer = () => {
           {["001", "002", "003"].map((num) => (
             <Button
               key={num}
-              size="sm"
+              size="small"
               variant="outlined"
               onClick={() => handleStudyChange(num)}
             >

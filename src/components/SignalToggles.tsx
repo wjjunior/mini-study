@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import Stack from "@mui/joy/Stack";
+import Stack from "@mui/material/Stack";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { signalsAtom, SignalKey } from "../domains/signal";
