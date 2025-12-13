@@ -37,6 +37,7 @@ function useAtomValue<T>(atom: any): T {
 
 describe("useEventPolling", () => {
   const originalError = console.error;
+  let consoleErrorSpy: jest.SpyInstance | null = null;
 
   beforeAll(() => {
     console.error = (...args: any[]) => {
@@ -44,7 +45,8 @@ describe("useEventPolling", () => {
         typeof args[0] === "string" &&
         (args[0].includes("An update to") ||
           args[0].includes("was not wrapped in act") ||
-          args[0].includes("TestComponent"))
+          args[0].includes("TestComponent") ||
+          args[0].includes("Error polling events:"))
       ) {
         return;
       }
@@ -53,6 +55,9 @@ describe("useEventPolling", () => {
   });
 
   afterAll(() => {
+    if (consoleErrorSpy) {
+      consoleErrorSpy.mockRestore();
+    }
     console.error = originalError;
   });
 
@@ -129,7 +134,7 @@ describe("useEventPolling", () => {
     const abortError = new DOMException("Aborted", "AbortError");
     mockFetchEvents.mockRejectedValue(abortError);
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
 
     renderHook(() => useEventPolling(), {
       wrapper: createWrapper(),
@@ -139,15 +144,16 @@ describe("useEventPolling", () => {
       expect(mockFetchEvents).toHaveBeenCalled();
     });
 
-    expect(consoleSpy).not.toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+    consoleErrorSpy.mockRestore();
+    consoleErrorSpy = null;
   });
 
   it("should handle non-abort errors and log them", async () => {
     const error = new Error("Network error");
     mockFetchEvents.mockRejectedValue(error);
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
 
     renderHook(() => useEventPolling(), {
       wrapper: createWrapper(),
@@ -158,10 +164,14 @@ describe("useEventPolling", () => {
     });
 
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith("Error polling events:", error);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error polling events:",
+        error
+      );
     });
 
-    consoleSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+    consoleErrorSpy = null;
   });
 
   it("should cancel polling and abort requests on unmount", async () => {
