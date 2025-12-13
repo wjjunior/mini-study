@@ -1,10 +1,9 @@
 import { useCallback, useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import { studyMetadataAtom } from "../domains/study";
 import { timeWindowAtom } from "../shared/store";
-import { StyledText } from "../shared/ui/styled";
+import { StyledText, StyledResponsiveStack } from "../shared/ui/styled";
 
 const TimelineControls = () => {
   const metadata = useRecoilValue(studyMetadataAtom);
@@ -35,7 +34,7 @@ const TimelineControls = () => {
   }, []);
 
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
+    <StyledResponsiveStack direction="row" spacing={1} alignItems="center">
       <StyledText.Label>Zoom window:</StyledText.Label>
       {windowSizes.map((size) => (
         <Button
@@ -50,7 +49,7 @@ const TimelineControls = () => {
       <StyledText.TertiaryWithMargin>
         Current: {timeWindow.startSec}s → {timeWindow.endSec}s
       </StyledText.TertiaryWithMargin>
-    </Stack>
+    </StyledResponsiveStack>
   );
 };
 

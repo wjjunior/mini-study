@@ -3,3 +3,7 @@ export { StyledTitle } from "./StyledTitle";
 export { StyledText, StyledSignalTitle } from "./StyledText";
 export { StyledSignalPlotBox } from "./StyledSignalPlotBox";
 export { StyledBaselineBox } from "./StyledBaselineBox";
+export { StyledCanvasContainer } from "./StyledCanvasContainer";
+export { StyledCanvas } from "./StyledCanvas";
+export { StyledResponsiveSvg } from "./StyledResponsiveSvg";
+export { StyledResponsiveStack } from "./StyledResponsiveStack";

@@ -1,11 +1,10 @@
 import { useMemo, useCallback } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import Stack from "@mui/material/Stack";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { signalsAtom, SignalKey } from "../domains/signal";
 import { visibleSignalKeysAtom } from "../shared/store";
-import { StyledText } from "../shared/ui/styled";
+import { StyledText, StyledResponsiveStack } from "../shared/ui/styled";
 import type { SignalKey as SignalKeyType } from "../domains/signal/model/types";
 
 const SignalToggles = () => {
@@ -33,7 +32,7 @@ const SignalToggles = () => {
   );
 
   return (
-    <Stack direction="row" spacing={2} alignItems="center">
+    <StyledResponsiveStack direction="row" spacing={2} alignItems="center">
       <StyledText.Label>Visible signals:</StyledText.Label>
       {signalKeys.map((key) => {
         const signal = signals[key];
@@ -52,7 +51,7 @@ const SignalToggles = () => {
           />
         );
       })}
-    </Stack>
+    </StyledResponsiveStack>
   );
 };
 

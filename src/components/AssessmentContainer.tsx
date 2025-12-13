@@ -15,12 +15,14 @@ import {
   errorStateAtom,
   chartDimensionsAtom,
 } from "../shared/store";
+import { useResponsiveDimensions } from "../shared/lib/hooks/useResponsiveDimensions";
 import { COLORS } from "../shared/lib/theme";
 import {
   StyledContainer,
   StyledTitle,
   StyledText,
   StyledBaselineBox,
+  StyledResponsiveStack,
 } from "../shared/ui/styled";
 import SignalToggles from "./SignalToggles";
 import TimelineControls from "./TimelineControls";
@@ -37,6 +39,7 @@ const AssessmentContainer = () => {
   const displaySignals = useRecoilValue(displaySignalsSelector);
   const events = useRecoilValue(filteredEventsSelector);
 
+  useResponsiveDimensions();
   useStudyData();
   useEventPolling();
 
@@ -84,7 +87,7 @@ const AssessmentContainer = () => {
             : "Loaded"}
         </StyledText.Secondary>
 
-        <Stack direction="row" spacing={1} alignItems="center">
+        <StyledResponsiveStack direction="row" spacing={1} alignItems="center">
           <StyledText.Label>
             Switch study (test race conditions):
           </StyledText.Label>
@@ -98,7 +101,7 @@ const AssessmentContainer = () => {
               Study {num.slice(-1)}
             </Button>
           ))}
-        </Stack>
+        </StyledResponsiveStack>
 
         {displaySignals.hr && (
           <StyledBaselineBox variant={getBaselineVariant()}>

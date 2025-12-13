@@ -1,9 +1,12 @@
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { COLORS } from "../shared/lib/theme";
 import {
   StyledSignalPlotBox,
   StyledText,
   StyledSignalTitle,
+  StyledCanvasContainer,
+  StyledCanvas,
+  StyledResponsiveSvg,
 } from "../shared/ui/styled";
 import {
   downsampleSignal,
@@ -20,6 +23,7 @@ type MiniSignalPlotProps = {
 };
 
 const SVG_THRESHOLD = 1000;
+const PADDING = 24;
 
 const MiniSignalPlot = ({
   title,
@@ -30,9 +34,28 @@ const MiniSignalPlot = ({
   timestamps,
 }: MiniSignalPlotProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const padding = 24;
-  const innerW = Math.max(1, width - padding * 2);
-  const innerH = Math.max(1, height - padding * 2);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(width);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setContainerWidth(rect.width || width);
+      }
+    };
+
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+
+    return () => {
+      window.removeEventListener("resize", updateWidth);
+    };
+  }, [width]);
+
+  const actualWidth = containerWidth;
+  const innerW = Math.max(1, actualWidth - PADDING * 2);
+  const innerH = Math.max(1, height - PADDING * 2);
 
   const { processedData, yMin, yMax, useCanvas } = useMemo(() => {
     if (!values || values.length === 0) {
@@ -120,7 +143,7 @@ const MiniSignalPlot = ({
     ctx.lineWidth = 1;
     ctx.strokeRect(0, 0, innerW, innerH);
 
-    const yRange = Math.max(1e-6, yMax - yMin);
+    const canvasYRange = Math.max(1e-6, yMax - yMin);
 
     const xAt = (i: number) => {
       if (ts && ts.length === n) {
@@ -133,7 +156,7 @@ const MiniSignalPlot = ({
     };
 
     const yAt = (val: number) => {
-      const rel = (val - yMin) / yRange;
+      const rel = (val - yMin) / canvasYRange;
       return innerH - rel * innerH;
     };
 
@@ -168,21 +191,16 @@ const MiniSignalPlot = ({
         )}
       </StyledText.Stats>
       {useCanvas ? (
-        <div style={{ width, height, position: "relative" }}>
-          <canvas
-            ref={canvasRef}
-            width={innerW}
-            height={innerH}
-            style={{
-              position: "absolute",
-              top: padding,
-              left: padding,
-            }}
-          />
-        </div>
+        <StyledCanvasContainer ref={containerRef} height={height}>
+          <StyledCanvas ref={canvasRef} width={innerW} height={innerH} />
+        </StyledCanvasContainer>
       ) : (
-        <svg width={width} height={height}>
-          <g transform={`translate(${padding}, ${padding})`}>
+        <StyledResponsiveSvg
+          height={height}
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
+          <g transform={`translate(${PADDING}, ${PADDING})`}>
             <rect
               width={innerW}
               height={innerH}
@@ -193,7 +211,7 @@ const MiniSignalPlot = ({
               <path d={svgPath} stroke={color} fill="none" strokeWidth={1.5} />
             )}
           </g>
-        </svg>
+        </StyledResponsiveSvg>
       )}
     </StyledSignalPlotBox>
   );
