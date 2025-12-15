@@ -339,7 +339,7 @@ src/
 Run tests with:
 
 ```bash
-npm test
+yarn test
 ```
 
 All 71 tests should pass, covering:
