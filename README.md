@@ -1,5 +1,7 @@
 # Mini Study Viewer Assessment
 
+https://mini-study.vercel.app/
+
 This folder contains an intentionally problematic "Study Viewer" built with React + Recoil. It simulates loading study signals and rendering a basic chart. The code purposefully includes bad state management and performance pitfalls.
 
 ## Your Tasks
